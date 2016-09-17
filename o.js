@@ -48,6 +48,7 @@
         base.oConfig = base.oConfig || {
             endpoint: null,
             format: 'json', 	//The media format. Default is JSON.
+	    emitFormatQuery: false,
             version: 4, 		//currently only tested for Version 4. Most will work in version 3 as well.
             strictMode: true, 	//strict mode throws exception, non strict mode only logs them
             start: null, 		//a function which is executed on loading
@@ -445,6 +446,9 @@
         // TODO: maybe add some pseudonyms...
         // +++
         base.get = function (callback, errorCallback) {
+            if(!base.oConfig.emitFormatQuery){
+                removeQuery('$format');
+	    }
             // init the q -> if node require a node promise -> if ES6, try ES6 promise
             var promise = initPromise();
             currentPromise = promise.defer();
@@ -842,9 +846,11 @@
                 resource = res;
 
             //add the default format
-            if (!isQuery('$format')) {
-                addQuery('$format', base.oConfig.format);
-            }
+	    if(base.oConfig.emitFormatQuery){
+	        if (!isQuery('$format')) {
+		    addQuery('$format', base.oConfig.format);
+	        }
+	    }
 
             //appendings
             for (var i = 0; i < oConfig.appending.length; i++) {
